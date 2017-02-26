@@ -1,0 +1,20 @@
+path <- file.path("..", "household_power_consumption.txt")
+header <- read.table(path, sep = ";", nrow = 1)
+df <- read.table(path, sep = ";", skip = 66637, nrow = 2880)
+colnames(df) <- sapply(header, as.character)
+df$Date <- as.Date(df$Date, "%d/%m/%Y")
+df[] <- sapply(df, as.character)
+df[,3:9] <- sapply(df[,3:9], as.numeric)
+df <- transform(df, timestamp = strptime(paste(Date, Time), "%Y-%m-%d %H:%M:%S"))
+
+png(filename = "plot4.png", width = 480, height = 480)
+par(mfrow=c(2,2))
+plot(df$timestamp, df$Global_active_power, type="l", xlab="", ylab="Global Active Power")
+plot(df$timestamp, df$Voltage, type="l", xlab="datetime", ylab="Voltage")
+plot(df$timestamp, df$Sub_metering_1, type="l", xlab="", ylab="Energy sub metering")
+lines(df$timestamp, df$Sub_metering_2, col="red")
+lines(df$timestamp, df$Sub_metering_3, col="blue")
+legend("topright", col=c("black","red","blue"), c("Sub_metering_1  ","Sub_metering_2  ", "Sub_metering_3  "),lty=c(1,1), bty="n", cex=.5) #bty removes the box, cex shrinks the text
+plot(df$timestamp, df$Global_reactive_power, type="l", xlab="datetime", ylab="Global_reactive_power")
+
+dev.off()

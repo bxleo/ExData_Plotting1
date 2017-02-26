@@ -1,0 +1,12 @@
+path <- file.path("..", "household_power_consumption.txt")
+header <- read.table(path, sep = ";", nrow = 1)
+df <- read.table(path, sep = ";", skip = 66637, nrow = 2880)
+colnames(df) <- sapply(header, as.character)
+df$Date <- as.Date(df$Date, "%d/%m/%Y")
+df[] <- sapply(df, as.character)
+df[,3:9] <- sapply(df[,3:9], as.numeric)
+df <- transform(df, timestamp = strptime(paste(Date, Time), "%Y-%m-%d %H:%M:%S"))
+
+png(filename = "plot2.png", width = 480, height = 480)
+plot(df$timestamp, df$Global_active_power, type="l", xlab="", ylab="Global Active Power (kilowatts)")
+dev.off()
